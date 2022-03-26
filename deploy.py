@@ -12,7 +12,6 @@ with open("SimpleStorage.sol", "r") as file:
     simple_storage_file = file.read()
 
 # compile our solidity
-
 compiled_sol = compile_standard(
     {
         "language": "Solidity",
@@ -30,17 +29,20 @@ compiled_sol = compile_standard(
 )
 with open("compiled_code.json", "w") as file:
     json.dump(compiled_sol, file)
-# print(compiled_sol)
 
+# print(compiled_sol)
 # get bytecode
 bytecode = compiled_sol["contracts"]["SimpleStorage.sol"]["SimpleStorage"]["evm"]["bytecode"]["object"]
 
 # get abi
 abi = compiled_sol["contracts"]["SimpleStorage.sol"]["SimpleStorage"]["abi"]
 
-# web3
-w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545"))
-chain_id = 1337
+# Web3
+# infura end point url
+w3 = Web3(Web3.HTTPProvider("https://rinkeby.infura.io/v3/0be36526dbe04cf7ac0cdbc4451b5a7d"))
+
+# chain id de rinkeby es 4, de ganache es 1337
+chain_id = 4
 my_address = os.getenv("ADDRESS")
 private_key = os.getenv("PRIVATE_KEY")
 
@@ -76,7 +78,6 @@ simple_storage = w3.eth.contract(address=tx_receipt.contractAddress, abi=abi)
 
 # Call -> Simulate making the call and getting a return value
 # Transact -> Actually make a state change
-
 # print(simple_storage.functions.retrieve().call)
 # creamos la transaccion
 store_transaction = simple_storage.functions.store(15).buildTransaction(
@@ -87,6 +88,7 @@ store_transaction = simple_storage.functions.store(15).buildTransaction(
         "nonce": nonce + 1,
     }
 )
+
 # firmamos la transaccion
 signed_store_txn = w3.eth.account.sign_transaction(
     store_transaction,private_key=private_key
@@ -94,8 +96,7 @@ signed_store_txn = w3.eth.account.sign_transaction(
 # enviamos la transaccion
 send_store_tx = w3.eth.send_raw_transaction(signed_store_txn.rawTransaction)
 
-# esperamos ue finalice 
-
+# esperamos que finalice
 tx_receipt = w3.eth.wait_for_transaction_receipt(send_store_tx)
 print(simple_storage.functions.retrieve().call())
 
