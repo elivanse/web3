@@ -16,8 +16,9 @@ contract SimpleStorage
     mapping(string => uint256) public nameToFavoriteNumber;
     
     // ingreso un uin256
-    function store(uint256 _favoriteNumber) public {
+    function store(uint256 _favoriteNumber) public returns(uint256) {
         favoriteNumber = _favoriteNumber;
+        return _favoriteNumber;
     }
      
     // funciones con transacciones view o pure
